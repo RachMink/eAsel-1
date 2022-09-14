@@ -1,36 +1,34 @@
-import React, { useState, useEffect, createContext } from 'react'
+import React, { useState, useEffect, createContext } from "react";
 
 const AuthContext = createContext();
 const { Provider } = AuthContext;
 
-
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(false)
+  const [user, setUser] = useState(false);
 
   useEffect(() => {
-    fetch('/api/auth/login')
-      .then(response => {
-        if(!response.ok) {
-          throw new Error('Unauthenticated')
+    fetch("/api/auth/login")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unauthenticated");
         }
 
         return response.json();
       })
-      .then(body => setUser(body))
-      .catch(err => setUser(false))
-  }, [])
+      .then((body) => setUser(body))
+      .catch((err) => setUser(false));
+  }, []);
 
   const authenticate = (email, password) => {
-    return fetch('/api/auth/login', {
-      method: 'POST',
+    return fetch("/api/auth/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      
     })
       .then((response) => {
-        if(response.ok) {
+        if (response.ok) {
           return response.json();
         }
       })
@@ -38,24 +36,24 @@ const AuthProvider = ({ children }) => {
         setUser(body);
         return body;
       });
-  }
+  };
   const signout = () => {
-    return fetch('/api/auth/logout', {
-      method: 'POST',
+    return fetch("/api/auth/logout", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-      }
+        "Content-Type": "application/json",
+      },
     })
       .then((response) => {
-        if(response.ok) {
+        if (response.ok) {
           return response.json();
         }
       })
       .then((body) => {
-        setUser(false)
+        setUser(false);
         return body;
       });
-  }
+  };
 
   return (
     <Provider
@@ -63,12 +61,12 @@ const AuthProvider = ({ children }) => {
         authenticate,
         signout,
         isAuthenticated: user ? true : false,
-        user
+        user,
       }}
     >
-      { children }
+      {children}
     </Provider>
-  )
-}
+  );
+};
 
 export { AuthContext, AuthProvider };

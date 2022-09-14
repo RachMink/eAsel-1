@@ -1,12 +1,28 @@
-import { Container, ImageList, ImageListItem, ImageListItemBar } from "@material-ui/core";
+import {
+  Container,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
+} from "@material-ui/core";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import {
-  DialogTitle, DialogContent, Button, DialogActions, Dialog,
-  ListItemText, List, ListItem, Typography, Collapse, Slide,
-  ListItemIcon, makeStyles, IconButton
+  DialogTitle,
+  DialogContent,
+  Button,
+  DialogActions,
+  Dialog,
+  ListItemText,
+  List,
+  ListItem,
+  Typography,
+  Collapse,
+  Slide,
+  ListItemIcon,
+  makeStyles,
+  IconButton,
 } from "@material-ui/core";
 // import Snackbar from '@material-ui/core/Snackbar';
-import React, { useEffect, useContext, useState} from "react";
+import React, { useEffect, useContext, useState } from "react";
 // import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
@@ -14,7 +30,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import Loading from "../components/Loading";
 import FavoriteIcon from "@material-ui/icons/Favorite";
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from "../context/AuthContext";
 import CustomSnackBar from "../components/CustomSnackBar";
 
 const useStyles = makeStyles((theme) => ({
@@ -55,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     right: theme.spacing(3),
     font: "large",
     //top: theme.spacing(0),
-},
+  },
 }));
 
 // const Transition = React.forwardRef(function Transition(props, ref) {
@@ -65,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 //   return <MuiAlert elevation={6} variant="outline" {...props} />;
 // }
 function BuyHomePage(props) {
-  console.log(props.location.state)
+  console.log(props.location.state);
   //get id of user so we can add the specific artwork to user's cart - does this get the artist of the artwork's id? or the person using the app's id
   // const params = new URLSearchParams(window.location.search);
   // const id = params.get("id");
@@ -76,27 +92,27 @@ function BuyHomePage(props) {
   const [loading, setLoading] = useState(true);
   const [likedArtworks, setLikedArtworks] = useState([]);
   const [selectedTile, setSelectedTile] = useState(null);
-  const [snackOpen , setSnackOpen] = useState(false);
+  const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [color, setColor] = useState("");
-  if( typeof props.location.state !== "undefined"){
+  if (typeof props.location.state !== "undefined") {
     setSnackMessage(props.location.state.snackMessage);
     setSnackOpen(true);
     props.location.state = undefined;
   }
   const changeColor = () => {
     color === "" ? setColor("red") : setColor("");
-  }
-  const toggleLike = artworkid => {
+  };
+  const toggleLike = (artworkid) => {
     let method = "";
     let additional = "";
     let headers = {};
     let body = "";
-    if(color === ""){
+    if (color === "") {
       method = "POST";
-      additional = '/new';
-      headers = { 'Content-Type': 'application/json'};
+      additional = "/new";
+      headers = { "Content-Type": "application/json" };
       body = JSON.stringify({ artworkid });
     } else {
       method = "DELETE";
@@ -106,15 +122,14 @@ function BuyHomePage(props) {
     fetch(`/api/liked${additional}`, {
       method,
       headers,
-      body
-    })
-      .then(res => {
-        if(res.ok){
-          getLikedArtworks();
-          changeColor();
-        }
-      })
-  }
+      body,
+    }).then((res) => {
+      if (res.ok) {
+        getLikedArtworks();
+        changeColor();
+      }
+    });
+  };
   const handleSnackClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -125,8 +140,8 @@ function BuyHomePage(props) {
   const handleClickOpen = (tile) => {
     // console.log(tile.id);
     setSelectedTile(tile);
-    for(let item of likedArtworks){
-      if(item.artworkId === tile.id){
+    for (let item of likedArtworks) {
+      if (item.artworkId === tile.id) {
         changeColor();
       }
     }
@@ -144,22 +159,22 @@ function BuyHomePage(props) {
     // console.log("hi")
     // setLoading(false);
     fetch("/api/liked")
-      .then(res => {
-        if(res.ok){
+      .then((res) => {
+        if (res.ok) {
           // console.log("hi")
           return res.json();
         }
       })
-      .then(data => {
-        if(!data){
+      .then((data) => {
+        if (!data) {
           // console.log("hi")
           setLikedArtworks([]);
         } else {
-        setLikedArtworks(data);
+          setLikedArtworks(data);
         }
         setLoading(false);
-      })
-  }
+      });
+  };
 
   const addToCart = () => {
     //add item to to specific user's cart
@@ -185,9 +200,9 @@ function BuyHomePage(props) {
       .catch((err) => {
         // console.log("Error:", err);
       });
-      handleClose();
-      setSnackOpen(true);
-      setSnackMessage("Successfully added artwork to cart 🙂");
+    handleClose();
+    setSnackOpen(true);
+    setSnackMessage("Successfully added artwork to cart 🙂");
   };
 
   const descriptionOpen = () => {
@@ -196,37 +211,40 @@ function BuyHomePage(props) {
 
   const getArtworks = () => {
     fetch("/api/artworks")
-      .then(res => {
-        if(res.ok){
+      .then((res) => {
+        if (res.ok) {
           return res.json();
         }
       })
-      .then(data => {
-        if(!data){
+      .then((data) => {
+        if (!data) {
           setArtwork([]);
         } else {
-        setArtwork(data);
+          setArtwork(data);
         }
-      })
-  }
+      });
+  };
   useEffect(() => {
     setLoading(true);
     getArtworks();
     getLikedArtworks();
   }, []);
-  if (loading){
+  if (loading) {
     return <Loading />;
   }
-  if(artwork.length === 0){
-    return <Container><Typography>No Items for sale..</Typography></Container>
+  if (artwork.length === 0) {
+    return (
+      <Container>
+        <Typography>No Items for sale..</Typography>
+      </Container>
+    );
   }
   return (
     <div className={classes.root}>
       <ImageList cols={1} className={classes.gridList}>
-        
         {artwork.map((tile) => (
           <ImageListItem key={tile.id} onClick={() => handleClickOpen(tile)}>
-            <img src={tile.uri} alt={tile.uri}/>
+            <img src={tile.uri} alt={tile.uri} />
             <ImageListItemBar
               title={tile.title}
               subtitle={<span>by: {tile.artistName}</span>} //how to get artistName according to artwork...
@@ -238,6 +256,12 @@ function BuyHomePage(props) {
       <Dialog
         open={selectedTile !== null}
         onClose={handleClose}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          // flexWrap: "wrap",
+        }}
         // TransitionComponent={Transition}
         // style={{ overflow: "scroll" }}
       >
@@ -250,8 +274,8 @@ function BuyHomePage(props) {
         )}
         {selectedTile && (
           <DialogTitle id="scroll-dialog-title">
-            {
-              auth.isAuthenticated && (<div
+            {auth.isAuthenticated && (
+              <div
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -266,9 +290,11 @@ function BuyHomePage(props) {
                 >
                   <FavoriteIcon />
                 </IconButton>
-              </div>)
-            }
-            <Typography variant="subtitle2">{selectedTile.artistName}</Typography>
+              </div>
+            )}
+            <Typography variant="subtitle2">
+              {selectedTile.artistName}
+            </Typography>
             <Typography variant="subtitle2">
               {"$"}
               {selectedTile.price}
@@ -281,9 +307,7 @@ function BuyHomePage(props) {
             style={{ overflow: "scroll-view" }}
             id="scroll-dialog-description"
           >
-            <List disablepadding="true" disablegutters="true" 
-            dense={true}
-            >
+            <List disablepadding="true" disablegutters="true" dense={true}>
               <ListItem
                 alignItems="flex-start"
                 disablepadding="true"
@@ -335,19 +359,23 @@ function BuyHomePage(props) {
               <CloseIcon />
               Go Back
             </Button>
-            <Button variant="outlined" onClick={addToCart}>
-              <ShoppingCartIcon />
-              Add to Cart
-            </Button>
+            {auth.isAuthenticated && (
+              <Button variant="outlined" onClick={addToCart}>
+                <ShoppingCartIcon />
+                Add to Cart
+              </Button>
+            )}
           </DialogActions>
         )}
       </Dialog>
 
-      <CustomSnackBar open={snackOpen} close={handleSnackClose} 
+      <CustomSnackBar
+        open={snackOpen}
+        close={handleSnackClose}
         // classes={classes}
-          message={snackMessage}/>
+        message={snackMessage}
+      />
     </div>
   );
 }
 export default BuyHomePage;
-

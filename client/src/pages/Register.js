@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 // import LoginButton from '../components/LoginButton';
 // import LogoutButton from '../components/LogoutButton';
-import AuthForm from '../components/AuthForm';
+import AuthForm from "../components/AuthForm";
 // function SignIn() {
 //   const handleSubmit = (event) => {
 //     event.preventDefault();
@@ -16,7 +16,7 @@ import AuthForm from '../components/AuthForm';
 export default function Signup() {
   return (
     <div>
-      <AuthForm type="Sign Up"/>
+      <AuthForm type="Sign Up" />
     </div>
-  )
+  );
 }

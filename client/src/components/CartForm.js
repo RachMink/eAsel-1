@@ -7,8 +7,11 @@ import {
   createTheme,
   IconButton,
   Snackbar,
-  Dialog, DialogContent,
-   DialogActions, DialogTitle, DialogContentText
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  DialogContentText,
 } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
@@ -16,7 +19,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { AuthContext } from "../context/AuthContext";
 import LoginForm from "./LoginForm";
-import { Redirect } from 'react-router';
+import { Redirect } from "react-router";
 import CustomSnackBar from "./CustomSnackBar";
 
 const theme = createTheme();
@@ -31,119 +34,116 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function CartForm(props) {
- const auth = useContext(AuthContext);
-    const [artworks, setArtworks] = useState([]);
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [snackOpen , setSnackOpen] = useState(false);
-    const [snackMessage, setSnackMessage ] = useState("");
-    const [snackError, setSnackError] = useState(false);
-    const [redirect, setRedirect] = useState(false);
-    const classes = useStyles();
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = React.useState(false);
+  const auth = useContext(AuthContext);
+  const [artworks, setArtworks] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+  const [snackError, setSnackError] = useState(false);
+  const [redirect, setRedirect] = useState(false);
+  const classes = useStyles();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
-  //opens confirm checkout dialog 
-   const handleClickOpen = () => {
-      if(artworks.length === 0){
-        setSnackError(true);
-        setSnackMessage("Nothing to checkout...");
-        handleClose();
-        setSnackOpen(true);
-        return;
+  //opens confirm checkout dialog
+  const handleClickOpen = () => {
+    if (artworks.length === 0) {
+      setSnackError(true);
+      setSnackMessage("Nothing to checkout...");
+      handleClose();
+      setSnackOpen(true);
+      return;
     }
-     setOpen(true);
-   };
+    setOpen(true);
+  };
 
   //closes confirm checkout dialog
-   const handleClose = () => {
-     setOpen(false);
-   };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   //closes snackbar
-    const handleSnackClose = (event, reason) => {
-        if (reason === "clickaway") {
-          return;
-        }
-        setSnackOpen(false);
-      };
+  const handleSnackClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackOpen(false);
+  };
 
-    const getCarts = async () => {
-        fetch('/api/carts')
-          .then(res => {
-              if(res.ok){
-                  return res.json()
-              }
-              // console.log("FAILED");
-          })
-          .then(async data => {
-             await getArtworks(data);
-          })
-          
-          .catch(err => {
-              // console.log(err);
-          })
-          
-    }
-    const getArtworks = async (data) => {
-        let urllist=[];
-        let total = 0;
-        for(let item of data){
-          const response = await fetch(`/api/artworks/${item.artworkId}`);
-          const json = await response.json();
-          urllist.push(json);
-          //should we setTotalPrice(totalPrice + {json.price}) here?
-          total += json.price;
+  const getCarts = async () => {
+    fetch("/api/carts")
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
         }
-        setArtworks(urllist);
-          setTotalPrice(total);
-   }
+        // console.log("FAILED");
+      })
+      .then(async (data) => {
+        await getArtworks(data);
+      })
 
-    useEffect( () => {
-        getCarts();
-        
-    }, [])
-    const decrementPrice = (id) => {
-        for(let item of artworks){
-            if(item.id === id){
-                setTotalPrice(totalPrice - item.price);
-            }
-        }
+      .catch((err) => {
+        // console.log(err);
+      });
+  };
+  const getArtworks = async (data) => {
+    let urllist = [];
+    let total = 0;
+    for (let item of data) {
+      const response = await fetch(`/api/artworks/${item.artworkId}`);
+      const json = await response.json();
+      urllist.push(json);
+      //should we setTotalPrice(totalPrice + {json.price}) here?
+      total += json.price;
     }
+    setArtworks(urllist);
+    setTotalPrice(total);
+  };
 
-    function deleteItem(id){
-        setLoading(true);
-        fetch(`/api/carts/${id}`, {
-            method: "DELETE"
-        }) .then(() => {
-          getCarts()
-        })
-        decrementPrice(id);
-        setSnackError(false);
-        setSnackMessage("Successfully Deleted Artwork")
-        setSnackOpen(true);
-        setLoading(false)
+  useEffect(() => {
+    getCarts();
+  }, []);
+  const decrementPrice = (id) => {
+    for (let item of artworks) {
+      if (item.id === id) {
+        setTotalPrice(totalPrice - item.price);
+      }
     }
-    function handleCheckout(){
-        setLoading(true);
-        fetch("/api/checkout", {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-        })
-            .then(() => {
-                setLoading(false);
-            })
-        setRedirect(true);
-        setSnackError(true);
-        setSnackMessage("Successfully Checked Out!");
-        setSnackOpen(true);
-    }
-    // console.log(artworks)
-    if(!auth.isAuthenticated && !loading) return <LoginForm from="/cart"/>;
-    if(redirect){
-        return <Redirect to="/"/>
-    }
+  };
+
+  function deleteItem(id) {
+    setLoading(true);
+    fetch(`/api/carts/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      getCarts();
+    });
+    decrementPrice(id);
+    setSnackError(false);
+    setSnackMessage("Successfully Deleted Artwork");
+    setSnackOpen(true);
+    setLoading(false);
+  }
+  function handleCheckout() {
+    setLoading(true);
+    fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(() => {
+      setLoading(false);
+    });
+    setRedirect(true);
+    setSnackError(true);
+    setSnackMessage("Successfully Checked Out!");
+    setSnackOpen(true);
+  }
+  // console.log(artworks)
+  if (!auth.isAuthenticated && !loading) return <LoginForm from="/cart" />;
+  if (redirect) {
+    return <Redirect to="/" />;
+  }
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs" spacing={3}>
@@ -221,14 +221,14 @@ export default function CartForm(props) {
               );
             })}
           </Grid>
-            </Box>
-            <CustomSnackBar 
-              open={snackOpen} 
-              message={snackMessage}
-              close={handleSnackClose} 
-              error={snackError}/>
-        </Container>
-      </ThemeProvider>
-
+        </Box>
+        <CustomSnackBar
+          open={snackOpen}
+          message={snackMessage}
+          close={handleSnackClose}
+          error={snackError}
+        />
+      </Container>
+    </ThemeProvider>
   );
 }
